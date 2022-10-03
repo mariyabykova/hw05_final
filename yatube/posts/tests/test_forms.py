@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 
-from posts.forms import PostForm
+from posts.forms import PostForm, CommentForm
 from posts.models import Post, Group, Comment
 
 User = get_user_model()
@@ -102,6 +102,30 @@ class PostFormTests(TestCase):
                 group=self.group.id,
             ).exists()
         )
+
+
+class CommentFormTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='auth')
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test-slug',
+            description='Тестовое описание',
+        )
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовый пост',
+            group=cls.group,
+        )
+        cls.form = CommentForm()
+
+    def setUp(self):
+        self.guest_client = Client()
+        user_author = CommentFormTests.user
+        self.authorized_client_author = Client()
+        self.authorized_client_author.force_login(user_author)
 
     def test_authorized_client_can_comment_posts(self):
         """Форма создания комментария
