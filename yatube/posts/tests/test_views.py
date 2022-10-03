@@ -200,7 +200,7 @@ class PostPagesTests(TestCase):
     def test_cache_works_correctly(self):
         """Кеширование главной страницы работает корректно."""
         new_post = Post.objects.create(
-            author=PostPagesTests.user,
+            author=self.user,
             text='Новый пост',
             group=self.group,
         )
