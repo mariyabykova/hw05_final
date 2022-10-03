@@ -321,8 +321,9 @@ class FollowTests(TestCase):
         подписаться на автора.
         """
         count = Follow.objects.count()
-        self.guest_client.get(reverse('posts:profile_follow', kwargs={'username': self.author.username}))
+        response = self.guest_client.get(reverse('posts:profile_follow', kwargs={'username': self.author.username}))
         self.assertEqual(Follow.objects.count(), count)
+        self.assertRedirects(response, f'/auth/login/?next=/profile/{self.author.username}/follow/')
 
     def test_new_posts_appear_at_page_of_followers(self):
         """Если пользователь подписывается на автора,
