@@ -146,9 +146,6 @@ class CommentFormTests(TestCase):
                 text='Тестовый комментарий'
             ).exists()
         )
-        self.assertEqual(
-            len(response.context['comments']), comments_count + 1
-        )
 
     def test_guest_client_can_not_add_comment(self):
         """Неавторизированный пользователь
