@@ -333,7 +333,7 @@ class FollowTests(TestCase):
             author=self.author
         )
         response = self.authorized_client_follower.get(reverse('posts:follow_index'))
-        self.assertEqual(response.context['page_obj'][0], self.post)
+        self.assertIn(self.post, response.context['page_obj'])
         self.assertTrue(Follow.objects.filter(user=self.user, author=self.author).exists())
 
     def test_new_posts_are_not_on_page_of_not_follower(self):
