@@ -78,7 +78,7 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:settings.CHARS_IN_STR]
-    
+
 
 class Follow(models.Model):
     user = models.ForeignKey(

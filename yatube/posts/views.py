@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import cache_page
 from django.conf import settings
 
 from . forms import PostForm, CommentForm
@@ -97,7 +96,7 @@ def add_comment(request, post_id):
         comment.author = request.user
         comment.post = post
         comment.save()
-    return redirect('posts:post_detail', post_id=post_id) 
+    return redirect('posts:post_detail', post_id=post_id)
 
 
 @login_required
@@ -116,7 +115,7 @@ def profile_follow(request, username):
     if Follow.objects.filter(
         user=request.user,
         author=following_author
-    ).exists(): 
+    ).exists():
         return redirect('posts:profile', username=username)
     if following_author != request.user:
         Follow.objects.create(
@@ -131,4 +130,4 @@ def profile_unfollow(request, username):
     following_author = get_object_or_404(User, username=username)
     follow = Follow.objects.filter(user=request.user, author=following_author)
     follow.delete()
-    return redirect('posts:profile', username=username) 
+    return redirect('posts:profile', username=username)

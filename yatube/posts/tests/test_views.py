@@ -22,13 +22,13 @@ class PostPagesTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
-        small_gif = (            
-             b'\x47\x49\x46\x38\x39\x61\x02\x00'
-             b'\x01\x00\x80\x00\x00\x00\x00\x00'
-             b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-             b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-             b'\x0A\x00\x3B'
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
         )
         uploaded = SimpleUploadedFile(
             name='small.gif',
@@ -193,10 +193,8 @@ class PostPagesTests(TestCase):
             author=self.user,
             text='Тестовый комментарий'
         )
-        response = self.authorized_client.get(
-            reverse('posts:post_detail',
-            kwargs={'post_id': self.post.id})
-        )
+        response = (self.authorized_client.get(reverse(
+                    'posts:post_detail', kwargs={'post_id': self.post.id})))
         self.assertIn(new_comment, response.context['comments'])
 
     def test_cache_works_correctly(self):
@@ -290,7 +288,7 @@ class FollowTests(TestCase):
             text='Тестовый пост',
             group=cls.group,
         )
-    
+
     def setUp(self):
         self.guest_client = Client()
         user_author = FollowTests.author
@@ -302,28 +300,45 @@ class FollowTests(TestCase):
         user_follower = FollowTests.client
         self.authorized_client = Client()
         self.authorized_client.force_login(user_follower)
-    
+
     def test_authorized_user_can_follow_author(self):
         """Авторизированный пользователь может подписаться на автора."""
         count = Follow.objects.count()
-        self.authorized_client_follower.get(reverse('posts:profile_follow', kwargs={'username': self.author.username}))
-        self.assertTrue(Follow.objects.filter(user=self.user, author=self.author).exists())
+        follow_address = reverse(
+            'posts:profile_follow', kwargs={'username': self.author.username}
+        )
+        response = self.authorized_client_follower.get(follow_address)
+        self.assertTrue(Follow.objects.filter(user=self.user,
+                        author=self.author).exists())
         self.assertEqual(Follow.objects.count(), count + 1)
+        self.assertRedirects(response, reverse('posts:profile', kwargs={
+                             'username': self.author.username}))
 
     def test_authorized_user_can_unfollow_author(self):
         """Авторизированный пользователь может отписаться от автора."""
         Follow.objects.create(user=self.user, author=self.author)
-        self.authorized_client_follower.get(reverse('posts:profile_unfollow', kwargs={'username': self.author.username}))
-        self.assertFalse(Follow.objects.filter(user=self.user, author=self.author).exists())
+        unfollow_address = reverse(
+            'posts:profile_unfollow', kwargs={'username': self.author.username}
+        )
+        self.authorized_client_follower.get(unfollow_address)
+        self.assertFalse(
+            Follow.objects.filter(user=self.user, author=self.author).exists()
+        )
 
     def test_guest_client_cannot_follow_author(self):
-        """Неавторизированный пользователь не может 
+        """Неавторизированный пользователь не может
         подписаться на автора.
         """
         count = Follow.objects.count()
-        response = self.guest_client.get(reverse('posts:profile_follow', kwargs={'username': self.author.username}))
+        follow_address = reverse(
+            'posts:profile_follow', kwargs={'username': self.author.username}
+        )
+        response = self.guest_client.get(follow_address)
         self.assertEqual(Follow.objects.count(), count)
-        self.assertRedirects(response, f'/auth/login/?next=/profile/{self.author.username}/follow/')
+        self.assertRedirects(
+            response,
+            f'/auth/login/?next=/profile/{self.author.username}/follow/'
+        )
 
     def test_new_posts_appear_at_page_of_followers(self):
         """Если пользователь подписывается на автора,
@@ -332,9 +347,12 @@ class FollowTests(TestCase):
             user=self.user,
             author=self.author
         )
-        response = self.authorized_client_follower.get(reverse('posts:follow_index'))
+        response = self.authorized_client_follower.get(
+            reverse('posts:follow_index')
+        )
         self.assertIn(self.post, response.context['page_obj'])
-        self.assertTrue(Follow.objects.filter(user=self.user, author=self.author).exists())
+        self.assertTrue(Follow.objects.filter(
+                        user=self.user, author=self.author).exists())
 
     def test_new_posts_are_not_on_page_of_not_follower(self):
         """Посты автора не появляются на странице follow_index
@@ -345,4 +363,3 @@ class FollowTests(TestCase):
         )
         response = self.authorized_client.get(reverse('posts:follow_index'))
         self.assertNotIn(self.post, response.context['page_obj'])
-        

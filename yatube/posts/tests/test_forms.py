@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 
-from posts.forms import PostForm, CommentForm
+from posts.forms import PostForm
 from posts.models import Post, Group, Comment
 
 User = get_user_model()
@@ -47,13 +47,13 @@ class PostFormTests(TestCase):
     def test_create_post(self):
         """Форма создания поста работает корректно."""
         posts_count = Post.objects.count()
-        small_gif = (            
-             b'\x47\x49\x46\x38\x39\x61\x02\x00'
-             b'\x01\x00\x80\x00\x00\x00\x00\x00'
-             b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-             b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-             b'\x0A\x00\x3B'
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
         )
         uploaded = SimpleUploadedFile(
             name='small.gif',
@@ -102,7 +102,7 @@ class PostFormTests(TestCase):
                 group=self.group.id,
             ).exists()
         )
-    
+
     def test_authorized_client_can_comment_posts(self):
         """Форма создания комментария
         работает для авторизированного пользователя.
@@ -122,10 +122,10 @@ class PostFormTests(TestCase):
                 text='Тестовый комментарий'
             ).exists()
         )
-        self.assertEqual(len(
-                    response.context['comments']), comments_count + 1
-                )
-        
+        self.assertEqual(
+            len(response.context['comments']), comments_count + 1
+        )
+
     def test_guest_client_can_not_add_comment(self):
         """Неавторизированный пользователь
         не может оставлять комментарии.
@@ -146,4 +146,3 @@ class PostFormTests(TestCase):
                 text='Тестовый комментарий'
             ).exists()
         )
-        
