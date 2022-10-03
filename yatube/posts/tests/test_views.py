@@ -303,6 +303,27 @@ class FollowTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(user_follower)
     
+    def test_authorized_user_can_follow_author(self):
+        """Авторизированный пользователь может подписаться на автора."""
+        count = Follow.objects.count()
+        self.authorized_client_follower.get(reverse('posts:profile_follow', kwargs={'username': self.author.username}))
+        self.assertTrue(Follow.objects.filter(user=self.user, author=self.author).exists())
+        self.assertEqual(Follow.objects.count(), count + 1)
+
+    def test_authorized_user_can_unfollow_author(self):
+        """Авторизированный пользователь может отписаться от автора."""
+        Follow.objects.create(user=self.user, author=self.author)
+        self.authorized_client_follower.get(reverse('posts:profile_unfollow', kwargs={'username': self.author.username}))
+        self.assertFalse(Follow.objects.filter(user=self.user, author=self.author).exists())
+
+    def test_guest_client_cannot_follow_author(self):
+        """Неавторизированный пользователь не может 
+        подписаться на автора.
+        """
+        count = Follow.objects.count()
+        self.guest_client.get(reverse('posts:profile_follow', kwargs={'username': self.author.username}))
+        self.assertEqual(Follow.objects.count(), count)
+
     def test_new_posts_appear_at_page_of_followers(self):
         """Если пользователь подписывается на автора,
         посты автора появляются на странице пользователя follow_index."""
@@ -323,3 +344,4 @@ class FollowTests(TestCase):
         )
         response = self.authorized_client.get(reverse('posts:follow_index'))
         self.assertNotIn(self.post, response.context['page_obj'])
+        
