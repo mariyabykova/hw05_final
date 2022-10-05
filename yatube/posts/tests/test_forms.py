@@ -80,8 +80,10 @@ class PostFormTests(TestCase):
                 image='posts/small.gif'
             ).exists()
         )
-    
+
     def test_not_image_in_image_field_asserts_error(self):
+        """При попытке загрузить не картинку в поле image
+        форма выдаёт ошибку."""
         video = SimpleUploadedFile(
             'file.mp4',
             b'file_content',
