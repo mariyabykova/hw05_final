@@ -80,6 +80,28 @@ class PostFormTests(TestCase):
                 image='posts/small.gif'
             ).exists()
         )
+    
+    def test_not_image_in_image_field_asserts_error(self):
+        video = SimpleUploadedFile(
+            'file.mp4',
+            b'file_content',
+            content_type='video/mp4'
+        )
+        form_data = {
+            'text': 'Новый текст',
+            'group': self.group.id,
+            'image': video,
+        }
+        response = self.authorized_client_author.post(
+            reverse('posts:post_create'),
+            data=form_data,
+        )
+        error_message = (
+            'Загрузите правильное изображение. Файл,'
+            ' который вы загрузили, поврежден'
+            ' или не является изображением.'
+        )
+        self.assertFormError(response, 'form', 'image', error_message)
 
     def test_edit_post(self):
         """Форма редактирования поста работает корректно."""
