@@ -31,7 +31,6 @@ class PostFormTests(TestCase):
             text='Тестовый пост',
             group=cls.group,
         )
-        cls.form = PostForm()
 
     @classmethod
     def tearDownClass(cls):
@@ -143,7 +142,6 @@ class CommentFormTests(TestCase):
             text='Тестовый пост',
             group=cls.group,
         )
-        cls.form = CommentForm()
 
     def setUp(self):
         self.guest_client = Client()
