@@ -43,7 +43,7 @@
       {% endthumbnail %}
       <p>{{ post.text }}</p>
       <a href="{% url 'posts:post_detail' post.pk %}">подробная информация </a>
-      <br>   
+      &nbsp;&nbsp;&nbsp;
       {% if post.group %}       
       <a href="{% url 'posts:group_list' post.group.slug %}">{{ post.group.title }} - все записи группы</a>
       {% endif %} 
