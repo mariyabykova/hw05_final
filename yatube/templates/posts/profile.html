@@ -34,7 +34,7 @@
     {% for post in page_obj %}
       <ul>
         <li>
-          Автор: {{ author.username }}
+          Автор: {% if author.get_full_name %}{{ author.get_full_name }}{% else %}{{ author.username }}{% endif %}
           <a href="{% url 'posts:profile' author.username %}">все посты пользователя</a>
         </li>
         <li>
