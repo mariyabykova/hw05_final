@@ -6,7 +6,7 @@
 {% endblock %}
 {% block content %}
   {% include 'posts/includes/switcher.html' %}
-  {% cache 20 index_page %}
+  {% cache 20 index_page page_obj.number %}
     {% for post in page_obj %}
       {% include 'posts/includes/post_info.html' %}
       {% if post.group %}
